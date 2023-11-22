@@ -8,7 +8,7 @@ services:
       - 9090:3001
   atd-lab-api:
     container_name: atd-lab-api
-    image: jasoniv/kdm-lab-api:latest
+    image: jasoniv/atd-lab-api:latest
     command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
     restart: on-failure:5
     ports: 
