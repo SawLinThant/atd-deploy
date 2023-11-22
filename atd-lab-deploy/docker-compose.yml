@@ -13,12 +13,12 @@ services:
       - 8081:80
   atd-lab:
     container_name: atd-lab
-    image: atd-lab-web:latest
+    image: sawlinthant/atd-lab-web:latest
     ports:
       - 9090:3001
   atd-lab-api:
     container_name: atd-lab-api
-    image: atd-lab-api:latest
+    image: jasoniv/kdm-lab-api:latest
     command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
     restart: on-failure:5
     ports: 
