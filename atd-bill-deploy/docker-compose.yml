@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  atd-bill-nginx:
+    container_name: atd-bill-nginx
+    depends_on:
+      - atd-bill
+      - atd-bill-api
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - 80:80
+  atd-bill:
+    container_name: atd-bill
+    image: jasoniv/atd-bill:latest
+    ports:
+      - 3000:3000
+  atd-bill-api:
+    container_name: atd-bill-api
+    image: jasoniv/atd-bill-api:latest
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    restart: on-failure:5
+    ports: 
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@atd-bill-db/atd_bill
+      - SECRET_KEY=secret
+      - ALGORITHM=HS256
+    depends_on:
+      - atd-bill-db
+  atd-bill-db:
+    container_name: atd-bill-db
+    image: postgres:13-alpine
+    volumes:
+      - atd-bill-data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=atd_bill
+volumes:
+  atd-bill-data:

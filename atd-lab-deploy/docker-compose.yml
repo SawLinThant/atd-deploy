@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  lab-nginx:
+    container_name: atd-lab-nginx
+    depends_on:
+      - atd-lab
+      - atd-lab-api
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - 8081:80
+  atd-lab:
+    container_name: atd-lab
+    image: atd-lab-web:latest
+    ports:
+      - 9090:3001
+  atd-lab-api:
+    container_name: atd-lab-api
+    image: atd-lab-api:latest
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
+    restart: on-failure:5
+    ports: 
+      - 8001:8001
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@atd-lab-db/ATDLAB
+      - SECRET_KEY=secret
+      - ALGORITHM=HS256
+    depends_on:
+      - atd-lab-db
+  atd-lab-db:
+    container_name: atd-lab-db
+    image: postgres:13-alpine
+    volumes:
+      - atd-lab-data:/var/lib/postgresql/data/
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ATDLAB
+volumes:
+  atd-lab-data:
