@@ -25,7 +25,7 @@ services:
     volumes:
       - atd-bill-data:/var/lib/postgresql/data/
     ports:
-      - 5432:5433
+      - 5434:5433
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
